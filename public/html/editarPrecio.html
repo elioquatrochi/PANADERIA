@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Precio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card shadow">
+        <div class="card-body">
+          <h1 class="card-title text-center mb-4">Editar Producto</h1>
+
+          <form id="edit-form">
+            <input type="hidden" id="id" />
+
+            <div class="mb-3">
+              <label class="form-label" for="producto">Producto</label>
+              <input type="text" class="form-control" id="producto" required />
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="precio">Precio</label>
+              <input type="number" class="form-control" id="precio" required />
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary">Guardar</button>
+              <a href="index.html" class="btn btn-secondary">Cancelar</a>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Rellenar el formulario con los parámetros de la URL
+  const params = new URLSearchParams(window.location.search);
+
+  // Enlace que armas desde el index:  .../editarPrecio.html?id=<id_precio>&producto=<producto>&precio=<precio>
+  // OJO: en el index usa encodeURIComponent para producto
+  document.getElementById("id").value       = params.get("id");
+  document.getElementById("producto").value = decodeURIComponent(params.get("producto") || "");
+  document.getElementById("precio").value   = params.get("precio") || "";
+
+  document.getElementById("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const id       = document.getElementById("id").value;       // id_precio
+    const producto = document.getElementById("producto").value;
+    const precio   = document.getElementById("precio").value;
+
+    try {
+      const res = await fetch(`/producto/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ producto, precio })
+      });
+
+      if (res.ok) {
+        await Swal.fire("✅ Éxito", "Producto actualizado.", "success");
+        window.location.href = "index.html";
+      } else {
+        const data = await res.json().catch(() => ({}));
+        Swal.fire("❌ Error", data?.error || "No se pudo actualizar", "error");
+      }
+    } catch (err) {
+      console.error(err);
+      Swal.fire("❌ Error", "Error en la conexión.", "error");
+    }
+  });
+</script>
+</body>
+</html>

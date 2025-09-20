@@ -1,0 +1,132 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Fondo con imagen + overlay */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.6),
+      rgba(0, 0, 0, 0.6)
+    ),
+    url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Caja del formulario */
+.container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(15px);
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.6);
+  width: 350px;
+  color: white;
+  text-align: center;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.container h1 {
+  margin-bottom: 25px;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Labels */
+.container label {
+  float: left;
+  margin: 8px 0 5px 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Inputs */
+.container input[type="text"],
+.container input[type="password"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.container input[type="text"]::placeholder,
+.container input[type="password"]::placeholder {
+  color: #ddd;
+}
+
+.container input[type="text"]:focus,
+.container input[type="password"]:focus {
+  background: rgba(255, 255, 255, 0.25);
+  outline: none;
+  box-shadow: 0 0 10px #00c6ff, 0 0 20px #0072ff;
+}
+
+/* Botón principal */
+.btn {
+  display: block;
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: white;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: linear-gradient(135deg, #0072ff, #00c6ff);
+  transform: scale(1.05);
+  box-shadow: 0px 6px 20px rgba(0, 114, 255, 0.6);
+}
+
+/* Botón Google */
+.google-btn {
+  margin-top: 15px;
+  display: block;
+  background: #dd4b39;
+  color: white;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  width: 100%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.google-btn:hover {
+  background: #c23321;
+  transform: scale(1.05);
+  box-shadow: 0px 6px 20px rgba(221, 75, 57, 0.6);
+}
