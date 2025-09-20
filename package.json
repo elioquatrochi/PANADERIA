@@ -1,9 +1,25 @@
 {
+  "name": "panaderia",
+  "version": "1.0.0",
+  "description": "Proyecto Panadería",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "msnodesqlv8": "^5.1.1",
-    "mssql": "^11.0.1",
     "pg": "^8.16.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elioquatrochi/PANADERIA.git"
+  },
+  "keywords": [],
+  "author": "Elio Quatrochi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/elioquatrochi/PANADERIA/issues"
+  },
+  "homepage": "https://github.com/elioquatrochi/PANADERIA#readme"
 }
