@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const pool = require("./db"); // tu db.js adaptado a pg
+const pool = require("./db"); // importamos PostgreSQL
 
 const app = express();
 const port = process.env.PORT || 10000;
@@ -8,12 +8,12 @@ const port = process.env.PORT || 10000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// Ruta base → abre login.html
+// Home
 app.get("/", (_req, res) => {
   res.sendFile(path.join(__dirname, "public", "html", "login.html"));
 });
 
-// ================= LOGIN =================
+// LOGIN
 app.post("/login", async (req, res) => {
   const { usuario, contrasenia } = req.body;
 
@@ -38,7 +38,7 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// ================= PRODUCTOS =================
+// PRODUCTOS
 app.get("/productos", async (_req, res) => {
   try {
     const result = await pool.query(`
@@ -63,27 +63,16 @@ app.put("/producto/:id", async (req, res) => {
       return res.status(400).json({ error: "Datos incompletos" });
     }
 
-    await pool.query(
-      `UPDATE Producto SET producto = $1 WHERE id_precio = $2`,
-      [producto, id]
-    );
+    await pool.query(`UPDATE Producto SET producto = $1 WHERE id_precio = $2`, [producto, id]);
+    await pool.query(`UPDATE Precios SET precio = $1 WHERE id_precio = $2`, [precio, id]);
 
-    await pool.query(
-      `UPDATE Precios SET precio = $1 WHERE id_precio = $2`,
-      [precio, id]
-    );
-
-    return res.json({
-      success: true,
-      message: "Producto actualizado correctamente.",
-    });
+    return res.json({ success: true, message: "Producto actualizado correctamente." });
   } catch (err) {
     console.error("❌ Error al actualizar producto:", err);
     res.status(500).json({ error: "Error al actualizar el producto." });
   }
 });
 
-// ================= START SERVER =================
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en puerto ${port}`);
 });

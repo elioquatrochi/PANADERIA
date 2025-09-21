@@ -1,7 +1,6 @@
 {
   "name": "panaderia",
   "version": "1.0.0",
-  "description": "Proyecto Panadería",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
