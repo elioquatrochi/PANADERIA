@@ -1,12 +1,14 @@
 const express = require("express");
 const path = require("path");
-const pool = require("./db"); // importamos PostgreSQL
+const { sql, poolPromise } = require("./db"); // asegúrate de la ruta correcta
 
 const app = express();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 5000;  // 🚨 Railway asigna el puerto dinámico
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+
+// ====================== RUTAS ======================
 
 // Home
 app.get("/", (_req, res) => {
@@ -18,12 +20,14 @@ app.post("/login", async (req, res) => {
   const { usuario, contrasenia } = req.body;
 
   try {
-    const result = await pool.query(
-      `SELECT * FROM login WHERE usuario = $1 AND contrasenia = $2`,
-      [usuario, contrasenia]
-    );
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .input("usuario", sql.NVarChar(50), usuario)
+      .input("contrasenia", sql.NVarChar(50), contrasenia)
+      .query("SELECT * FROM login WHERE usuario = @usuario AND contrasenia = @contrasenia");
 
-    if (result.rows.length > 0) {
+    if (result.recordset.length > 0) {
       if (usuario === "admin") {
         return res.json({ success: true, rol: "admin" });
       } else {
@@ -38,24 +42,29 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// PRODUCTOS
+// PRODUCTOS & PRECIOS
 app.get("/productos", async (_req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT q.id_precio, q.producto, p.precio
-      FROM Precios AS p
-      INNER JOIN Producto AS q ON p.id_precio = q.id_precio
-      ORDER BY q.id_precio;
-    `);
-    res.json(result.rows);
+    const pool = await poolPromise;
+    const result = await pool
+      .request()
+      .query(`
+        SELECT q.id_precio, q.producto, p.precio
+        FROM Precios AS p
+        INNER JOIN Producto AS q ON p.id_precio = q.id_precio
+        ORDER BY q.id_precio;
+      `);
+    res.json(result.recordset);
   } catch (err) {
-    console.error("❌ Error en consulta productos:", err);
+    console.error("❌ Error en la consulta SQL (productos):", err);
     res.status(500).send("Error consultando productos");
   }
 });
 
+// UPDATE PRODUCTO
 app.put("/producto/:id", async (req, res) => {
   try {
+    const pool = await poolPromise;
     const id = parseInt(req.params.id, 10);
     const { producto, precio } = req.body;
 
@@ -63,16 +72,35 @@ app.put("/producto/:id", async (req, res) => {
       return res.status(400).json({ error: "Datos incompletos" });
     }
 
-    await pool.query(`UPDATE Producto SET producto = $1 WHERE id_precio = $2`, [producto, id]);
-    await pool.query(`UPDATE Precios SET precio = $1 WHERE id_precio = $2`, [precio, id]);
+    const request = pool
+      .request()
+      .input("id", sql.Int, id)
+      .input("producto", sql.NVarChar(50), producto)
+      .input("precio", sql.Int, parseInt(precio, 10));
 
-    return res.json({ success: true, message: "Producto actualizado correctamente." });
+    const result = await request.query(`
+      UPDATE Producto SET producto = @producto WHERE id_precio = @id;
+      UPDATE Precios  SET precio   = @precio   WHERE id_precio = @id;
+    `);
+
+    const ok =
+      Array.isArray(result.rowsAffected) &&
+      (result.rowsAffected[0] > 0 || result.rowsAffected[1] > 0);
+
+    if (ok) {
+      return res.json({
+        success: true,
+        message: "Producto actualizado correctamente."
+      });
+    }
+    return res.status(404).json({ error: "Producto no encontrado." });
   } catch (err) {
     console.error("❌ Error al actualizar producto:", err);
     res.status(500).json({ error: "Error al actualizar el producto." });
   }
 });
 
+// ====================== SERVER ======================
 app.listen(port, () => {
   console.log(`🚀 Servidor corriendo en puerto ${port}`);
 });
